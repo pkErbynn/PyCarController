@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:url_launcher/url_launcher.dart';
 // import 'dart:async';
+// import 'dart:async';
+// import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 String url = 'https://portal.ucc.edu.gh';
 
@@ -55,14 +58,7 @@ class _ControllerPageState extends State<ControllerPage> {
   //   }
   // }
 
-  // Future launchURL(String url) async{
-  //   if (await canLaunch(url)){
-  //     await launch(url, forceSafariVC:true, forceWebView:true)
-  //   }
-  //   else {
-  //     print("Can\"t lunch ${url}");
-  //   }
-  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -127,126 +123,199 @@ class _ControllerPageState extends State<ControllerPage> {
     );
   }
 
-  Widget _upButton() {
-    return RaisedButton(
-      onPressed: () {},
-      child: Icon(Icons.arrow_upward),
-    );
-  }
+        Widget _upButton() {
+          return RaisedButton(
+            onPressed: go_forward,
+            child: Icon(Icons.arrow_upward),
+                );
+              }
+        Widget _leftButton() {
+          return RaisedButton(
+            onPressed: go_forward,
+            child: Icon(Icons.arrow_upward),
+                );
+              }
+      
+      
+        Widget _rightButton() {
+          return RaisedButton(
+            child: Icon(Icons.arrow_forward),
+            onPressed: go_right,
+          );
+        }
+      
+        Widget _downButton() {
+          return RaisedButton(
+            onPressed: go_reverse,
+            child: Icon(Icons.arrow_downward),
+          );
+        }
+      
+      
+        Widget _stop_botton() {
+          return RaisedButton(
+            child: Text("Stop",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+            color: Colors.red,
+            onPressed: stop,
+          );
+        }
+      
+        // Widget _onOffController() {
+        //   return ListTile(
+        //     onTap: () {},
+        //     leading: Icon(
+        //       Icons.flash_on,
+        //       color: Colors.blue,
+        //     ),
+        //     title: Text("On/Off"),
+        //     subtitle: Text("Use controller to turn on/off the robot"),
+        //     trailing: Switch(
+        //       value: _isOn,
+        //       onChanged: (bool isChanged) {
+        //         setState(() {
+        //           _isOn = !_isOn;
+        //         });
+        //       },
+        //     ),
+        //   );
+        // }
+      
+        Widget _ipInput() {
+          return Column(
+            children: <Widget>[
+              TextField(
+                  controller: txt_edit_controller,
+                  // onChanged: (String url) {
+                  //   // setState(() {
+                  //   //   myUrl= url;
+                  //   // });
+                  //   // txt_edit_controller.text = '';
+                  // },
+                  // controller: txt_edit_controller,  this hides the data in the form
+                  decoration: InputDecoration(
+                      labelText: "Enter url",
+                      hintText: "http://ip_address",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)))),
+                  keyboardType: TextInputType.url),
+              // new Text(myUrl),
+      
+              RaisedButton(
+                  child: Text("Connect"),
+                  color: Theme.of(context).primaryColor,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    setState(() {
+                      myUrl = txt_edit_controller.text;
+                    });
+                    webViewController.loadUrl(myUrl);
+      
+                    // _launchURL();
+                    // launchURL(url);
+                    // Navigator.of(context).pushNamed('/webview');
+                  })
+              // )
+            ],
+          );
+        }
+      
+        Widget _cameraView() {
+          return Container(
+              height: MediaQuery.of(context).size.height / 2 - 80.0,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15.0),
+                  color: Colors.grey,
+                  boxShadow: [
+                    new BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 5.0,
+                    ),
+                  ]),
+              child: WebView(
+                  initialUrl: myUrl,
+                  javascriptMode: JavascriptMode.unrestricted,
+                  onWebViewCreated: (WebViewController wb) {
+                    _controller.complete(wb);
+                    webViewController = wb;
+                  }));
+        }
 
-  Widget _leftButton() {
-    return RaisedButton(
-      onPressed: () {},
-      child: Icon(Icons.arrow_back),
-    );
-  }
 
-  Widget _rightButton() {
-    return RaisedButton(
-      child: Icon(Icons.arrow_forward),
-      onPressed: () {},
-    );
-  }
+        ///////////////////////// control actions //////////////////////////
+        void go_forward() {
+          var up = "http://10.10.65.15:5050/forward";
+          http.get(up)
+          .then((response) {
+          print("Response status: ${response.statusCode}");
+          print("Response body: ${response.body}");
+          });
+        }
+        void go_reverse() {
+          var reverse = "http://10.10.65.15:5050/backward";
+          http.get(reverse)
+          .then((response) {
+          print("Response status: ${response.statusCode}");
+          print("Response body: ${response.body}");
+          });
+        }
+        void go_left() {
+          var left = "http://10.10.65.15:5050/left";
+          http.get(left)
+          .then((response) {
+          print("Response status: ${response.statusCode}");
+          print("Response body: ${response.body}");
+          });
+        }
+         
 
-  Widget _downButton() {
-    return RaisedButton(
-      onPressed: () {},
-      child: Icon(Icons.arrow_downward),
-    );
-  }
+        void go_right() {
+          var right = "http://10.10.65.15:5050/right";
+          http.get(right)
+          .then((response) {
+          print("Response status: ${response.statusCode}");
+          print("Response body: ${response.body}");
+          });
+        }
 
 
-  Widget _stop_botton() {
-    return RaisedButton(
-      child: Text("Stop",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-      color: Colors.red,
-      onPressed: () {},
-    );
-  }
-
-  // Widget _onOffController() {
-  //   return ListTile(
-  //     onTap: () {},
-  //     leading: Icon(
-  //       Icons.flash_on,
-  //       color: Colors.blue,
-  //     ),
-  //     title: Text("On/Off"),
-  //     subtitle: Text("Use controller to turn on/off the robot"),
-  //     trailing: Switch(
-  //       value: _isOn,
-  //       onChanged: (bool isChanged) {
-  //         setState(() {
-  //           _isOn = !_isOn;
-  //         });
-  //       },
-  //     ),
-  //   );
-  // }
-
-  Widget _ipInput() {
-    return Column(
-      children: <Widget>[
-        TextField(
-            controller: txt_edit_controller,
-            onChanged: (String url) {
-              // setState(() {
-              //   myUrl= url;
-              // });
-              // txt_edit_controller.text = '';
-            },
-            // controller: txt_edit_controller,  this hides the data in the form
-            decoration: InputDecoration(
-                labelText: "Enter url",
-                hintText: "http//ip_address",
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)))),
-            keyboardType: TextInputType.url),
-        new Text(myUrl),
-
-        RaisedButton(
-            child: Text("Connect"),
-            color: Theme.of(context).primaryColor,
-            textColor: Colors.white,
-            onPressed: () {
-              setState(() {
-                myUrl = txt_edit_controller.text;
-              });
-              webViewController.loadUrl(myUrl);
-
-              // _launchURL();
-              // launchURL(url);
-              // Navigator.of(context).pushNamed('/webview');
-            })
-        // )
-      ],
-    );
-  }
-
-  Widget _cameraView() {
-    return Container(
-        height: MediaQuery.of(context).size.height / 2 - 80.0,
-        width: double.infinity,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15.0),
-            color: Colors.grey,
-            boxShadow: [
-              new BoxShadow(
-                color: Colors.black,
-                blurRadius: 5.0,
-              ),
-            ]),
-        child: WebView(
-            initialUrl: myUrl,
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController wb) {
-              _controller.complete(wb);
-              webViewController = wb;
-            }));
-  }
+        void stop() {
+          var stop = "http://10.10.65.15:5050/stop";
+          http.get(stop)
+          .then((response) {
+          print("Response status: ${response.statusCode}");
+          print("Response body: ${response.body}");
+          });
+        }
 }
+// Future<   > getData() async {
+//     String url = 'https://quotes.rest/qod.json';
+//     final response =
+//         await http.get(url, headers: {"Accept": "application/json"});
+
+
+//     if (response.statusCode == 200) {
+//       return FetctData.fromJson(json.decode(response.body));
+//     } else {
+//       throw Exception('Failed to load post');
+//     }
+//   }
+
+
+
+// class FetctData {
+//   final String data;
+
+//   FetctData({this.data});
+
+//   factory FetctData.fromJson(Map<String, dynamic> json) {
+//     return (
+//         author: json['contents']['quotes'][0]['author'],
+//         data: json['contents']['quotes'][0]['quote']);
+//   }
+// }
 
 ////////////////////////////////////////////////////  end_of_code   /////////////////////////////////////////////////////////
 
@@ -298,4 +367,4 @@ class _ControllerPageState extends State<ControllerPage> {
 //   return TextFormField(
 //     decoration: ,
 //   )
-// }
+// }}
