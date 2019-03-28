@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:http/http.dart' as http;
 
-String url = 'https://ucc.edu.gh';
+String url = 'https://ucc.edu.gh';  // initial url
 
 class ControllerPage extends StatefulWidget {
   @override
@@ -22,11 +22,11 @@ class _ControllerPageState extends State<ControllerPage> {
   final TextEditingController txt_edit_controller = new TextEditingController();
 
   String myUrl = "";
-  // String open_url;
 
-  bool _isWebLoaded = false;
-  bool _canControlCamera = false;
+  bool _isWebLoaded = false;  // to change state when web view is loaded
+  bool _canControlCamera = false; // unused var
 
+  // not necessary
   @override
   void initState() {
     super.initState();
@@ -36,35 +36,35 @@ class _ControllerPageState extends State<ControllerPage> {
   void dispose() {
     controller.dispose();
     super.dispose();
-  }
+  } // end of  not necessary
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Robot Car Controller'),
-        actions: <Widget>[
-          IconButton(
+        actions: <Widget>[  // add action to icon at top right
+          IconButton(   // icon
             icon: Icon(Icons.camera),
             color: Colors.white,
-            onPressed: _lookAround,
+            onPressed: _lookAround,   // action is bellow
           )
         ],
       ),
       floatingActionButton: _isWebLoaded
-          ? _fab()
+          ? _fab()  // floating fab appear after page loaded for reset state
           : Container(
               height: 1.0,
-            ),
+            ),  // is not loaded...do not appear, ie height = 1, invisible
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: ListView(
-          children: <Widget>[
+          children: <Widget>[ // all actions invoked here
             _cameraView(),
-            SizedBox(
+            SizedBox(   // buttom padding
               height: 10.0,
             ),
-            _isWebLoaded ? Container(height: 1.0) : _ipInput(),
+            _isWebLoaded ? Container(height: 1.0) : _ipInput(),   // if page loaded, form and button disappear
             SizedBox(
               height: 5.0,
             ),
@@ -79,7 +79,7 @@ class _ControllerPageState extends State<ControllerPage> {
   }
 
 
-  Widget _directionController() {
+  Widget _directionController() { // up, down, right, left positioning
     return Stack(
       children: <Widget>[
         Positioned(left: 70.0, child: _upButton()),
@@ -102,6 +102,7 @@ class _ControllerPageState extends State<ControllerPage> {
     );
   }
 
+  // method for each direction control
   Widget _upButton() {
     return RaisedButton(
       onPressed: _goForward,
@@ -140,9 +141,9 @@ class _ControllerPageState extends State<ControllerPage> {
     );
   }
 
-  // for the camera view
+  // method for the camera view
   void _lookAround() {
-    var up = "http://192.168.6.1:5050/servo"; // camera endpoint
+    var up = "http://192.168.6.1:5050/servo";     // camera endpoint on server
     http.get(up).then((response) {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
@@ -166,20 +167,20 @@ class _ControllerPageState extends State<ControllerPage> {
                 labelText: "Enter url",
                 hintText: "http://ip address",
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)))),
-            keyboardType: TextInputType.url),
-        new Text(myUrl),  // for debugging
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)))),    // rounds input form edge
+            keyboardType: TextInputType.url),    // input type, url
+        new Text(myUrl),     // for debugging
 
-        RaisedButton(
-            child: Text("Connect"),
-            color: Theme.of(context).primaryColor,
-            textColor: Colors.white,
-            onPressed: () {
+        RaisedButton(       // connect button
+            child: Text("Connect"), // title
+            color: Theme.of(context).primaryColor,      // button color
+            textColor: Colors.white,     // text on button collor
+            onPressed: () {     // action
               setState(() {
-                myUrl = "http://" + txt_edit_controller.text;
-                _isWebLoaded = true;
+                myUrl = "http://" + txt_edit_controller.text;     // appending url to https://
+                    _isWebLoaded = true;  // when pressed, changes bool of var
               });
-              webViewController.loadUrl(myUrl);
+              webViewController.loadUrl(myUrl); 
             })
         // )
       ],
@@ -188,11 +189,11 @@ class _ControllerPageState extends State<ControllerPage> {
 
   Widget _cameraView() {
     return Container(
-        height: _isWebLoaded  // if-else statement to increase camera space
-            ? (MediaQuery.of(context).size.height / 2) + 110.0
+        height: _isWebLoaded     // if-else statement to increase camera space
+            ? (MediaQuery.of(context).size.height / 2) + 110.0  // increases height of camera when loaded
             : MediaQuery.of(context).size.height / 2 - 80.0,
-        width: double.infinity,
-        decoration: BoxDecoration(
+        width: double.infinity,     // auto width
+        decoration: BoxDecoration(     // applying style
             borderRadius: BorderRadius.circular(15.0),
             color: Colors.grey,
             boxShadow: [
@@ -201,7 +202,7 @@ class _ControllerPageState extends State<ControllerPage> {
                 blurRadius: 5.0,
               ),
             ]),
-        child: WebView(
+        child: WebView(    // web view embedded in container space
             initialUrl: myUrl,
             javascriptMode: JavascriptMode.unrestricted,
             onWebViewCreated: (WebViewController wb) {
@@ -218,7 +219,7 @@ class _ControllerPageState extends State<ControllerPage> {
           _isWebLoaded = false;
         });
       },
-      child: Icon(Icons.refresh),
+      child: Icon(Icons.refresh),   // icon
     );
   }
 }
