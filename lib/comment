@@ -1,0 +1,20 @@
+
+
+
+
+// TextEditingController _url = new TextEditingController();
+
+  // _open_url() {
+  //   print('open click');
+  // }
+
+  // _launchURL() async {
+  //   const url = 'http://google.com';
+  //   if (await canLaunch(url)) {
+  //     await launch(url);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
+  //
+

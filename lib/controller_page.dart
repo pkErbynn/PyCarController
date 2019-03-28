@@ -26,6 +26,9 @@ class _ControllerPageState extends State<ControllerPage> {
   String myUrl = "";
   String open_url;
 
+  bool _isWebLoaded = false;
+  bool _canControlCamera =false;
+
   @override
   void initState() {
     super.initState();
@@ -65,8 +68,22 @@ class _ControllerPageState extends State<ControllerPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Robot Car Controller'),
+        actions: <Widget>[
+          IconButton(icon: 
+            Icon(Icons.camera),
+            color: Colors.white,
+            onPressed: _lookAround,
+            
+            // onPressed: (){
+            //   setState(() {
+            //    _canControlCamera =true;
+            //   }
+            //   );
+            )
+        ],
       ),
-
+      // floatingActionButton: _isWebLoaded ? _cameraControlDirections() : Container(height: 1.0,),
+      floatingActionButton: _isWebLoaded ? _fab() : Container(height: 1.0,),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: ListView(
@@ -74,12 +91,12 @@ class _ControllerPageState extends State<ControllerPage> {
             //camera view
             _cameraView(),
             SizedBox(
-              height: 20.0,
+              height: 10.0,
             ),
             // _urlInput(),
-            _ipInput(),
+           _isWebLoaded ? Container(height: 1.0) : _ipInput(), 
             SizedBox(
-              height: 10.0,
+              height: 5.0,
             ),
             // _connectBtn(),
             // SizedBox(
@@ -90,15 +107,25 @@ class _ControllerPageState extends State<ControllerPage> {
             //   height: 30.0,
             // ),
 
-            _directionController(),
+            // _canControlCamera ? _lookAround() : Container(height: 1.0),
             SizedBox(
               height: 20.0,
-            )
+            ),
+
+
+
+            // _canControlCamera ? _fab() : Container(height: 1.0) ,
+            // _isWebLoaded ? _fab() : Container(height: 1.0) ,
+            
+            _directionController()
+            // _onOffInputController()
           ],
         ),
       ),
     );
   }
+
+
 
   Widget _directionController() {
     return Stack(
@@ -117,7 +144,11 @@ class _ControllerPageState extends State<ControllerPage> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 15.0, left: 250.0),
-          child: _stop_botton(),
+          child: _stopBotton(),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0, left: 250.0),
+          // child: _onOffInputController(),
         )
       ],
     );
@@ -125,14 +156,14 @@ class _ControllerPageState extends State<ControllerPage> {
 
         Widget _upButton() {
           return RaisedButton(
-            onPressed: go_forward,
+            onPressed: _goForward,
             child: Icon(Icons.arrow_upward),
                 );
               }
         Widget _leftButton() {
           return RaisedButton(
-            onPressed: go_forward,
-            child: Icon(Icons.arrow_upward),
+            onPressed: _goLeft,
+            child: Icon(Icons.arrow_back),
                 );
               }
       
@@ -140,47 +171,59 @@ class _ControllerPageState extends State<ControllerPage> {
         Widget _rightButton() {
           return RaisedButton(
             child: Icon(Icons.arrow_forward),
-            onPressed: go_right,
+            onPressed: _goRight,
           );
         }
       
         Widget _downButton() {
           return RaisedButton(
-            onPressed: go_reverse,
+            onPressed: _goReverse,
             child: Icon(Icons.arrow_downward),
           );
         }
       
       
-        Widget _stop_botton() {
+        Widget _stopBotton() {
           return RaisedButton(
             child: Text("Stop",
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
             color: Colors.red,
-            onPressed: stop,
+            onPressed: _stop,
           );
         }
+
+
+
+      // Widget _cameraDirectionController(){
+        void _lookAround() {
+          var up = "http://192.168.6.1:5050/servo";
+          http.get(up)
+          .then((response) {
+          print("Response status: ${response.statusCode}");
+          print("Response body: ${response.body}");
+          });
+        }
+        
+    //     return Stack(
+    //   children: <Widget>[
+        
+    //     Padding(
+    //         padding: const EdgeInsets.only(top: 40.0, left: 10.0),
+    //         child: RaisedButton(
+    //         onPressed: _lookAround,
+    //         child: Icon(Icons.arrow_back_ios),
+    //             )),
+        
+    //   ],
+    // );
+
+    
+      // }
+
+
       
-        // Widget _onOffController() {
-        //   return ListTile(
-        //     onTap: () {},
-        //     leading: Icon(
-        //       Icons.flash_on,
-        //       color: Colors.blue,
-        //     ),
-        //     title: Text("On/Off"),
-        //     subtitle: Text("Use controller to turn on/off the robot"),
-        //     trailing: Switch(
-        //       value: _isOn,
-        //       onChanged: (bool isChanged) {
-        //         setState(() {
-        //           _isOn = !_isOn;
-        //         });
-        //       },
-        //     ),
-        //   );
-        // }
+       
       
         Widget _ipInput() {
           return Column(
@@ -196,11 +239,11 @@ class _ControllerPageState extends State<ControllerPage> {
                   // controller: txt_edit_controller,  this hides the data in the form
                   decoration: InputDecoration(
                       labelText: "Enter url",
-                      hintText: "http://ip_address",
+                      hintText: "http://ip address",
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10.0)))),
                   keyboardType: TextInputType.url),
-              // new Text(myUrl),
+              new Text(myUrl),
       
               RaisedButton(
                   child: Text("Connect"),
@@ -208,7 +251,8 @@ class _ControllerPageState extends State<ControllerPage> {
                   textColor: Colors.white,
                   onPressed: () {
                     setState(() {
-                      myUrl = txt_edit_controller.text;
+                      myUrl = "http://"+txt_edit_controller.text;
+                      _isWebLoaded = true;
                     });
                     webViewController.loadUrl(myUrl);
       
@@ -223,7 +267,9 @@ class _ControllerPageState extends State<ControllerPage> {
       
         Widget _cameraView() {
           return Container(
-              height: MediaQuery.of(context).size.height / 2 - 80.0,
+              // height: MediaQuery.of(context).size.height / 2 - 80.0,
+
+              height: _isWebLoaded ? (MediaQuery.of(context).size.height / 2) + 110.0 : MediaQuery.of(context).size.height / 2 - 80.0 ,            
               width: double.infinity,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15.0),
@@ -243,26 +289,79 @@ class _ControllerPageState extends State<ControllerPage> {
                   }));
         }
 
+Widget  _cameraControlDirections(){
+  return Stack(
+      children: <Widget>[
+        Positioned(left: 70.0, child: RaisedButton(
+            onPressed: (){
+              
+            },
+            child: Icon(Icons.arrow_upward),
+                )),
+        Padding(
+            padding: const EdgeInsets.only(top: 40.0, left: 10.0),
+            child: RaisedButton(
+             onPressed: (){
+              
+            },
+            child: Icon(Icons.arrow_left),
+                )
+              ),
+        Padding(
+          padding: const EdgeInsets.only(top: 40.0, left: 128.0), //140
+          child: RaisedButton(
+            onPressed: (){
+
+            },
+            child: Icon(Icons.arrow_right),
+          ),
+        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 80.0, left: 70.0),
+        //   child: RaisedButton(
+        //     onPressed: (){
+              
+        //     },
+        //     child: Icon(Icons.arrow_upward)
+        //   ),
+        // ),
+        
+      ],
+    );
+    // Text("Camera Controls: Activated");
+  }
+
+        Widget _fab () {
+    return FloatingActionButton(
+      onPressed: () {
+        setState(() {
+         _isWebLoaded = false;
+        });
+      },
+      child: Icon(Icons.refresh),
+      );
+  }
+}
 
         ///////////////////////// control actions //////////////////////////
-        void go_forward() {
-          var up = "http://10.10.65.15:5050/forward";
+        void _goForward() {
+          var up = "http://192.168.6.1:5050/forward";
           http.get(up)
           .then((response) {
           print("Response status: ${response.statusCode}");
           print("Response body: ${response.body}");
           });
         }
-        void go_reverse() {
-          var reverse = "http://10.10.65.15:5050/backward";
+        void _goReverse() {
+          var reverse = "http://192.168.6.1:5050/backward";
           http.get(reverse)
           .then((response) {
           print("Response status: ${response.statusCode}");
           print("Response body: ${response.body}");
           });
         }
-        void go_left() {
-          var left = "http://10.10.65.15:5050/left";
+        void _goLeft() {
+          var left = "http://192.168.6.1:5050/left";
           http.get(left)
           .then((response) {
           print("Response status: ${response.statusCode}");
@@ -271,8 +370,8 @@ class _ControllerPageState extends State<ControllerPage> {
         }
          
 
-        void go_right() {
-          var right = "http://10.10.65.15:5050/right";
+        void _goRight() {
+          var right = "http://192.168.6.1:5050/right";
           http.get(right)
           .then((response) {
           print("Response status: ${response.statusCode}");
@@ -281,15 +380,17 @@ class _ControllerPageState extends State<ControllerPage> {
         }
 
 
-        void stop() {
-          var stop = "http://10.10.65.15:5050/stop";
+        void _stop() {
+          var stop = "http://192.168.6.1:5050/stop";
           http.get(stop)
           .then((response) {
           print("Response status: ${response.statusCode}");
           print("Response body: ${response.body}");
           });
         }
-}
+ 
+
+
 // Future<   > getData() async {
 //     String url = 'https://quotes.rest/qod.json';
 //     final response =
@@ -368,3 +469,25 @@ class _ControllerPageState extends State<ControllerPage> {
 //     decoration: ,
 //   )
 // }}
+
+
+
+ // Widget _onOffInputController() {
+        //   return ListTile(
+        //     onTap: () {},
+        //     leading: Icon(
+        //       Icons.flash_on,
+        //       color: Colors.blue,
+        //     ),
+        //     title: Text("On/Off"),
+        //     subtitle: Text("Use controller to turn on/off the robot"),
+        //     trailing: Switch(
+        //       value: _isOn,
+        //       onChanged: (bool isChanged) {
+        //         setState(() {
+        //           _isOn = !_isOn;
+        //         });
+        //       },
+        //     ),
+        //   );
+        // }
